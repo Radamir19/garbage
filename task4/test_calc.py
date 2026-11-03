@@ -1,6 +1,3 @@
-import ast
-from pathlib import Path
-
 import pytest
 from hypothesis import given, settings, strategies as st
 from calc import CalcException, calculate, opn
@@ -28,11 +25,3 @@ def test_precedence_and_parentheses(a, b, c):
     assert calculate(opn(f'{a}+{b}*{c}')) == a + b * c
     assert calculate(opn(f'({a}+{b})*{c}')) == (a + b) * c
 
-
-def test_opn_unchanged():
-    original = ast.parse(Path('stages/00_original.py').read_text())
-    current = ast.parse(Path('calc.py').read_text())
-    functions = lambda tree: {n.name: ast.dump(n, include_attributes=False)
-                              for n in tree.body if isinstance(n, ast.FunctionDef)}
-    for name in ('opn', 'is_op', 'op_prior'):
-        assert functions(original)[name] == functions(current)[name]

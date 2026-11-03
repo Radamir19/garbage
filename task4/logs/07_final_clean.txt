@@ -1,17 +1,17 @@
 $ /workspace/hw4-venv/bin/python -m pytest --hypothesis-show-statistics fuzz.py test_calc.py
 ============================= test session starts ==============================
 platform linux -- Python 3.12.14, pytest-8.3.5, pluggy-1.7.0
-rootdir: /workspace/hw4
+rootdir: /workspace/garbage/task4
 plugins: hypothesis-6.100.0
-collected 23 items
+collected 22 items
 
-fuzz.py ....                                                             [ 17%]
-test_calc.py ...................                                         [100%]
+fuzz.py ....                                                             [ 18%]
+test_calc.py ..................                                          [100%]
 ============================ Hypothesis Statistics =============================
 
 fuzz.py::test_calculate_with_processed_input:
 
-  - during generate phase (111.87 seconds):
+  - during generate phase (95.71 seconds):
     - Typical runtimes: < 1ms, of which < 1ms in data generation
     - 100000 passing examples, 0 failing examples, 0 invalid examples
 
@@ -20,7 +20,7 @@ fuzz.py::test_calculate_with_processed_input:
 
 fuzz.py::test_binary_expressions:
 
-  - during generate phase (7.93 seconds):
+  - during generate phase (7.86 seconds):
     - Typical runtimes: < 1ms, of which < 1ms in data generation
     - 10000 passing examples, 0 failing examples, 0 invalid examples
 
@@ -29,7 +29,7 @@ fuzz.py::test_binary_expressions:
 
 fuzz.py::test_large_powers:
 
-  - during generate phase (0.89 seconds):
+  - during generate phase (1.08 seconds):
     - Typical runtimes: < 1ms, of which < 1ms in data generation
     - 1000 passing examples, 0 failing examples, 0 invalid examples
 
@@ -38,7 +38,7 @@ fuzz.py::test_large_powers:
 
 fuzz.py::test_zero_negative_power:
 
-  - during generate phase (0.54 seconds):
+  - during generate phase (0.52 seconds):
     - Typical runtimes: < 1ms, of which < 1ms in data generation
     - 1000 passing examples, 0 failing examples, 0 invalid examples
 
@@ -47,14 +47,14 @@ fuzz.py::test_zero_negative_power:
 
 test_calc.py::test_precedence_and_parentheses:
 
-  - during generate phase (0.75 seconds):
-    - Typical runtimes: < 1ms, of which < 1ms in data generation
+  - during generate phase (0.79 seconds):
+    - Typical runtimes: ~ 0-1 ms, of which < 1ms in data generation
     - 1000 passing examples, 0 failing examples, 0 invalid examples
 
   - Stopped because settings.max_examples=1000
 
 
-======================== 23 passed in 122.64s (0:02:02) ========================
+======================== 22 passed in 107.90s (0:01:47) ========================
 
 Exit code: 0
-Elapsed: 123.523 s
+Elapsed: 108.401 s

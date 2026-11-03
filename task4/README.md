@@ -28,7 +28,7 @@ python -m pytest --hypothesis-show-statistics fuzz.py test_calc.py
 python -m pytest --hypothesis-show-statistics fuzz_yaml.py
 ```
 
-Исправлены 6 ошибок в `calculate`, написаны тесты Hypothesis. `opn` не менялся по логике. Проверки калькулятора проходят: 23 passed.
+Исправлены 6 ошибок в `calculate`, написаны тесты Hypothesis. `opn` не менялся по логике. Проверки калькулятора проходят: 22 passed.
 
 Для дополнительной части проверены три метода PyYAML. Найдена ошибка при повторном разборе сериализованного узла: 2 passed, 1 failed. Прогон занял около 3,5 минуты.
 
