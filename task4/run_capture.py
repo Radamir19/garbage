@@ -1,4 +1,4 @@
-"""Run pytest without hiding its exit status; retain actual console output."""
+
 import os
 from pathlib import Path
 import subprocess

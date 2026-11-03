@@ -16,7 +16,7 @@ def test_bad_inputs_use_public_exception(expression):
 @pytest.mark.parametrize(('expression', 'expected'), [
     ('0+0', 0), ('2+3*4', 14), ('(2+3)*4', 20),
     ('8/4', 2), ('7-12', -5), ('2^3', 8), ('0^0', 1),
-    ('1/0', float('inf')),  # Original behavior, outside the failure criterion.
+    ('1/0', float('inf')),
 ])
 def test_calculation_results(expression, expected):
     assert calculate(opn(expression)) == expected

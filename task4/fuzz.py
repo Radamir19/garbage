@@ -9,7 +9,7 @@ def test_calculate_with_processed_input(input_string):
     try:
         processed_input = opn(input_string)
     except Exception:
-        # opn is outside the scope of this assignment.
+
         return
     note(f'Input: {input_string!r}; RPN: {processed_input!r}')
     try:
@@ -18,7 +18,7 @@ def test_calculate_with_processed_input(input_string):
         pass
 
 
-# Structured expressions reach arithmetic that arbitrary Unicode rarely reaches.
+
 @settings(max_examples=10_000, deadline=None, derandomize=True, database=None)
 @given(a=st.integers(0, 100), b=st.integers(0, 100),
        operator=st.sampled_from(["+", "-", "*", "/", "^", "!"]))

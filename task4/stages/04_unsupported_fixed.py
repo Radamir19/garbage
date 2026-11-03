@@ -50,7 +50,7 @@ def is_op(c):
 
 def op_prior(op):
     priorities = {"^": 3, "*": 2, "/": 2, "%": 2}
-    return priorities.get(op, 1)  # Default to + or -
+    return priorities.get(op, 1)
 
 
 def calculate(s_in):
@@ -80,7 +80,7 @@ def calculate(s_in):
                     case "^":
                         a **= b
                     case "!":
-                        # Operator semantics are not specified; reject via the public API.
+
                         raise CalcException(
                             "Оператор ! не поддерживается"
                         )

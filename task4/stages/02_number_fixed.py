@@ -50,7 +50,7 @@ def is_op(c):
 
 def op_prior(op):
     priorities = {"^": 3, "*": 2, "/": 2, "%": 2}
-    return priorities.get(op, 1)  # Default to + or -
+    return priorities.get(op, 1)
 
 
 def calculate(s_in):
@@ -64,7 +64,7 @@ def calculate(s_in):
                         "Неверное количество данных в стеке для операции " + token
                     )
                 b, a = stack.pop(), stack.pop()
-                match s_tmp[1]:  # get first character
+                match s_tmp[1]:
                     case "+":
                         a += b
                     case "-":
@@ -80,7 +80,7 @@ def calculate(s_in):
                     case "^":
                         a **= b
                     case "!":
-                        # This operation is not implemented
+
                         raise NotImplementedError(
                             "TODO: Не забыть реализовать оператор !"
                         )
