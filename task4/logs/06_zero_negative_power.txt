@@ -1,0 +1,77 @@
+$ /workspace/hw4-venv/bin/python -m pytest --hypothesis-show-statistics fuzz.py::test_zero_negative_power
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.3.5, pluggy-1.7.0
+rootdir: /workspace/hw4
+plugins: hypothesis-6.100.0
+collected 1 item
+
+fuzz.py F                                                                [100%]
+
+=================================== FAILURES ===================================
+___________________________ test_zero_negative_power ___________________________
+
+    @settings(max_examples=1000, deadline=None, derandomize=True, database=None)
+>   @given(b=st.integers(1, 1000))
+
+fuzz.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+fuzz.py:46: in test_zero_negative_power
+    calculate(opn(f"0^(0-{b})"))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s_in = '0 0  1 - ^'
+
+    def calculate(s_in):
+        stack = []
+        for token in s_in.split():
+            try:
+                s_tmp = token.strip()
+                if len(s_tmp) == 1 and is_op(s_tmp):
+                    if len(stack) < 2:
+                        raise CalcException(
+                            "Неверное количество данных в стеке для операции " + token
+                        )
+                    b, a = stack.pop(), stack.pop()
+                    match s_tmp:
+                        case "+":
+                            a += b
+                        case "-":
+                            a -= b
+                        case "*":
+                            a *= b
+                        case "/":
+                            if b == 0:
+                                return float("inf")
+                            a /= b
+                        case "%":
+                            a %= b
+                        case "^":
+>                           a **= b
+E                           ZeroDivisionError: 0.0 cannot be raised to a negative power
+E                           Falsifying example: test_zero_negative_power(
+E                               b=1,  # or any other generated value
+E                           )
+
+calc.py:81: ZeroDivisionError
+============================ Hypothesis Statistics =============================
+fuzz.py::test_zero_negative_power:
+
+  - during generate phase (0.10 seconds):
+    - Typical runtimes: ~ 4-36 ms, of which ~ 0-1 ms in data generation
+    - 0 passing examples, 10 failing examples, 0 invalid examples
+    - Found 1 distinct error in this phase
+
+  - during shrink phase (0.59 seconds):
+    - Typical runtimes: ~ 3-6 ms, of which < 1ms in data generation
+    - 0 passing examples, 98 failing examples, 0 invalid examples
+    - Tried 98 shrinks of which 0 were successful
+
+  - Stopped because nothing left to do
+
+
+=========================== short test summary info ============================
+FAILED fuzz.py::test_zero_negative_power - ZeroDivisionError: 0.0 cannot be r...
+============================== 1 failed in 0.74s ===============================
+
+Exit code: 1
+Elapsed: 1.540 s

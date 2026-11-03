@@ -1,0 +1,39 @@
+$ /workspace/hw4-venv/bin/python yaml_repro.py
+PyYAML: 6.0.3
+Input: '!'
+Parsed: ScalarNode(tag='tag:yaml.org,2002:null', value='')
+With explicit_start=True: '---\n...\n'
+Workaround reparses successfully.
+Default serialization: '...\n'
+Reparsing default output (fails):
+Traceback (most recent call last):
+  File "/workspace/hw4/yaml_repro.py", line 17, in <module>
+    yaml.compose(rendered, Loader=yaml.SafeLoader)
+  File "/workspace/hw4-venv/lib/python3.12/site-packages/yaml/__init__.py", line 58, in compose
+    return loader.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/hw4-venv/lib/python3.12/site-packages/yaml/composer.py", line 36, in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/hw4-venv/lib/python3.12/site-packages/yaml/composer.py", line 55, in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/hw4-venv/lib/python3.12/site-packages/yaml/composer.py", line 64, in compose_node
+    if self.check_event(AliasEvent):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/hw4-venv/lib/python3.12/site-packages/yaml/parser.py", line 98, in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+  File "/workspace/hw4-venv/lib/python3.12/site-packages/yaml/parser.py", line 265, in parse_block_node
+    return self.parse_node(block=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/hw4-venv/lib/python3.12/site-packages/yaml/parser.py", line 369, in parse_node
+    raise ParserError("while parsing a %s node" % node, start_mark,
+yaml.parser.ParserError: while parsing a block node
+expected the node content, but found '<document end>'
+  in "<unicode string>", line 1, column 1:
+    ...
+    ^
+
+Exit code: 1
+Elapsed: 0.037 s

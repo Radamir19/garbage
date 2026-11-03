@@ -1,0 +1,188 @@
+$ /workspace/hw4-venv/bin/python -m pytest --hypothesis-show-statistics fuzz_yaml.py
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.3.5, pluggy-1.7.0
+rootdir: /workspace/hw4
+plugins: hypothesis-6.100.0
+collected 3 items
+
+fuzz_yaml.py .F.                                                         [100%]
+
+=================================== FAILURES ===================================
+_________________________________ test_compose _________________________________
+
+    @FUZZ
+>   @given(YAML_TEXT)
+
+fuzz_yaml.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+fuzz_yaml.py:45: in test_compose
+    restored = yaml.compose(yaml.serialize(node), Loader=yaml.SafeLoader)
+../hw4-venv/lib/python3.12/site-packages/yaml/__init__.py:58: in compose
+    return loader.get_single_node()
+../hw4-venv/lib/python3.12/site-packages/yaml/composer.py:36: in get_single_node
+    document = self.compose_document()
+../hw4-venv/lib/python3.12/site-packages/yaml/composer.py:55: in compose_document
+    node = self.compose_node(None, None)
+../hw4-venv/lib/python3.12/site-packages/yaml/composer.py:64: in compose_node
+    if self.check_event(AliasEvent):
+../hw4-venv/lib/python3.12/site-packages/yaml/parser.py:98: in check_event
+    self.current_event = self.state()
+../hw4-venv/lib/python3.12/site-packages/yaml/parser.py:265: in parse_block_node
+    return self.parse_node(block=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <yaml.loader.SafeLoader object at 0x7f59e61fd130>, block = True
+indentless_sequence = False
+
+    def parse_node(self, block=False, indentless_sequence=False):
+        if self.check_token(AliasToken):
+            token = self.get_token()
+            event = AliasEvent(token.value, token.start_mark, token.end_mark)
+            self.state = self.states.pop()
+        else:
+            anchor = None
+            tag = None
+            start_mark = end_mark = tag_mark = None
+            if self.check_token(AnchorToken):
+                token = self.get_token()
+                start_mark = token.start_mark
+                end_mark = token.end_mark
+                anchor = token.value
+                if self.check_token(TagToken):
+                    token = self.get_token()
+                    tag_mark = token.start_mark
+                    end_mark = token.end_mark
+                    tag = token.value
+            elif self.check_token(TagToken):
+                token = self.get_token()
+                start_mark = tag_mark = token.start_mark
+                end_mark = token.end_mark
+                tag = token.value
+                if self.check_token(AnchorToken):
+                    token = self.get_token()
+                    end_mark = token.end_mark
+                    anchor = token.value
+            if tag is not None:
+                handle, suffix = tag
+                if handle is not None:
+                    if handle not in self.tag_handles:
+                        raise ParserError("while parsing a node", start_mark,
+                                "found undefined tag handle %r" % handle,
+                                tag_mark)
+                    tag = self.tag_handles[handle]+suffix
+                else:
+                    tag = suffix
+            #if tag == '!':
+            #    raise ParserError("while parsing a node", start_mark,
+            #            "found non-specific tag '!'", tag_mark,
+            #            "Please check 'http://pyyaml.org/wiki/YAMLNonSpecificTag' and share your opinion.")
+            if start_mark is None:
+                start_mark = end_mark = self.peek_token().start_mark
+            event = None
+            implicit = (tag is None or tag == '!')
+            if indentless_sequence and self.check_token(BlockEntryToken):
+                end_mark = self.peek_token().end_mark
+                event = SequenceStartEvent(anchor, tag, implicit,
+                        start_mark, end_mark)
+                self.state = self.parse_indentless_sequence_entry
+            else:
+                if self.check_token(ScalarToken):
+                    token = self.get_token()
+                    end_mark = token.end_mark
+                    if (token.plain and tag is None) or tag == '!':
+                        implicit = (True, False)
+                    elif tag is None:
+                        implicit = (False, True)
+                    else:
+                        implicit = (False, False)
+                    event = ScalarEvent(anchor, tag, implicit, token.value,
+                            start_mark, end_mark, style=token.style)
+                    self.state = self.states.pop()
+                elif self.check_token(FlowSequenceStartToken):
+                    end_mark = self.peek_token().end_mark
+                    event = SequenceStartEvent(anchor, tag, implicit,
+                            start_mark, end_mark, flow_style=True)
+                    self.state = self.parse_flow_sequence_first_entry
+                elif self.check_token(FlowMappingStartToken):
+                    end_mark = self.peek_token().end_mark
+                    event = MappingStartEvent(anchor, tag, implicit,
+                            start_mark, end_mark, flow_style=True)
+                    self.state = self.parse_flow_mapping_first_key
+                elif block and self.check_token(BlockSequenceStartToken):
+                    end_mark = self.peek_token().start_mark
+                    event = SequenceStartEvent(anchor, tag, implicit,
+                            start_mark, end_mark, flow_style=False)
+                    self.state = self.parse_block_sequence_first_entry
+                elif block and self.check_token(BlockMappingStartToken):
+                    end_mark = self.peek_token().start_mark
+                    event = MappingStartEvent(anchor, tag, implicit,
+                            start_mark, end_mark, flow_style=False)
+                    self.state = self.parse_block_mapping_first_key
+                elif anchor is not None or tag is not None:
+                    # Empty scalars are allowed even if a tag or an anchor is
+                    # specified.
+                    event = ScalarEvent(anchor, tag, (implicit, False), '',
+                            start_mark, end_mark)
+                    self.state = self.states.pop()
+                else:
+                    if block:
+                        node = 'block'
+                    else:
+                        node = 'flow'
+                    token = self.peek_token()
+>                   raise ParserError("while parsing a %s node" % node, start_mark,
+                            "expected the node content, but found %r" % token.id,
+                            token.start_mark)
+E                   yaml.parser.ParserError: while parsing a block node
+E                   expected the node content, but found '<document end>'
+E                     in "<unicode string>", line 1, column 1:
+E                       ...
+E                       ^
+E                   Falsifying example: test_compose(
+E                       text='!',
+E                   )
+
+../hw4-venv/lib/python3.12/site-packages/yaml/parser.py:369: ParserError
+============================ Hypothesis Statistics =============================
+fuzz_yaml.py::test_safe_load:
+
+  - during generate phase (8.51 seconds):
+    - Typical runtimes: < 1ms, of which < 1ms in data generation
+    - 10000 passing examples, 0 failing examples, 0 invalid examples
+
+  - Stopped because settings.max_examples=10000
+
+
+fuzz_yaml.py::test_compose:
+
+  - during generate phase (5.97 seconds):
+    - Typical runtimes: ~ 0-3 ms, of which ~ 0-1 ms in data generation
+    - 3329 passing examples, 3 failing examples, 0 invalid examples
+    - Found 1 distinct error in this phase
+
+  - during shrink phase (0.22 seconds):
+    - Typical runtimes: ~ 0-31 ms, of which < 1ms in data generation
+    - 5 passing examples, 2 failing examples, 0 invalid examples
+    - Tried 7 shrinks of which 2 were successful
+
+  - Stopped because nothing left to do
+
+
+fuzz_yaml.py::test_safe_dump:
+
+  - during generate phase (189.56 seconds):
+    - Typical runtimes: ~ 0-36 ms, of which ~ 0-34 ms in data generation
+    - 10000 passing examples, 0 failing examples, 18 invalid examples
+    - Events:
+      * 29.26%, Retried draw from text(characters(categories=(), include_characters='abcXYZ012 -_\n\t:[]{}#абвёя'), max_size=40).filter(not_yet_in_unique_list) to satisfy filter
+      * 26.46%, Draw for recursive(one_of(none(), booleans(), integers(), floats(allow_nan=False, allow_infinity=False), text(alphabet='abcXYZ012 -_\n\t:[]{}#абвёя', max_size=40)), lambda child: st.one_of(st.lists(child, max_size=8), st.dictionaries(PAYLOAD, child, max_size=8)), max_leaves=30) exceeded max_leaves and had to be retried
+
+  - Stopped because settings.max_examples=10000
+
+
+=========================== short test summary info ============================
+FAILED fuzz_yaml.py::test_compose - yaml.parser.ParserError: while parsing a ...
+=================== 1 failed, 2 passed in 204.62s (0:03:24) ====================
+
+Exit code: 1
+Elapsed: 207.247 s

@@ -1,0 +1,88 @@
+$ /workspace/hw4-venv/bin/python -m pytest --hypothesis-show-statistics fuzz.py::test_binary_expressions
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.3.5, pluggy-1.7.0
+rootdir: /workspace/hw4
+plugins: hypothesis-6.100.0
+collected 1 item
+
+fuzz.py F                                                                [100%]
+
+=================================== FAILURES ===================================
+___________________________ test_binary_expressions ____________________________
+
+    @settings(max_examples=10_000, deadline=None, derandomize=True, database=None)
+>   @given(a=st.integers(0, 100), b=st.integers(0, 100),
+           operator=st.sampled_from(["+", "-", "*", "/", "^", "!"]))
+
+fuzz.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+fuzz.py:28: in test_binary_expressions
+    calculate(opn(expression))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s_in = '0 0 !'
+
+    def calculate(s_in):
+        stack = []
+        for token in s_in.split():
+            try:
+                s_tmp = token.strip()
+                if len(s_tmp) == 1 and is_op(s_tmp):
+                    if len(stack) < 2:
+                        raise CalcException(
+                            "Неверное количество данных в стеке для операции " + token
+                        )
+                    b, a = stack.pop(), stack.pop()
+                    match s_tmp:
+                        case "+":
+                            a += b
+                        case "-":
+                            a -= b
+                        case "*":
+                            a *= b
+                        case "/":
+                            if b == 0:
+                                return float("inf")
+                            a /= b
+                        case "%":
+                            a %= b
+                        case "^":
+                            a **= b
+                        case "!":
+                            # This operation is not implemented
+>                           raise NotImplementedError(
+                                "TODO: Не забыть реализовать оператор !"
+                            )
+E                           NotImplementedError: TODO: Не забыть реализовать оператор !
+E                           Falsifying example: test_binary_expressions(
+E                               a=0,  # or any other generated value
+E                               b=0,  # or any other generated value
+E                               operator='!',
+E                           )
+E                           Explanation:
+E                               These lines were always and only run by failing examples:
+E                                   /workspace/hw4/calc.py:82
+
+calc.py:84: NotImplementedError
+============================ Hypothesis Statistics =============================
+fuzz.py::test_binary_expressions:
+
+  - during generate phase (0.05 seconds):
+    - Typical runtimes: ~ 0-16 ms, of which ~ 0-1 ms in data generation
+    - 6 passing examples, 4 failing examples, 0 invalid examples
+    - Found 1 distinct error in this phase
+
+  - during shrink phase (1.16 seconds):
+    - Typical runtimes: ~ 0-5 ms, of which < 1ms in data generation
+    - 38 passing examples, 142 failing examples, 378 invalid examples
+    - Tried 558 shrinks of which 2 were successful
+
+  - Stopped because nothing left to do
+
+
+=========================== short test summary info ============================
+FAILED fuzz.py::test_binary_expressions - NotImplementedError: TODO: Не забыт...
+============================== 1 failed in 1.26s ===============================
+
+Exit code: 1
+Elapsed: 1.929 s
