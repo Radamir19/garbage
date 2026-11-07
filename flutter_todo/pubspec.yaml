@@ -1,0 +1,16 @@
+name: todo_navigation_task
+description: One-file navigation and dialog practice with an in-memory Todo list.
+publish_to: none
+version: 1.0.0+1
+environment:
+  sdk: '>=3.9.0 <4.0.0'
+  flutter: '>=3.35.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_slidable: 4.0.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true
